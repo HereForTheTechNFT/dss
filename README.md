@@ -1,3 +1,7 @@
+## Parcours francais
+
+Lecture commentee en francais du code de ce depot, un mecanisme par chapitre : voir docs/fr/.
+
 # Multi Collateral Dai
 ![Build Status](https://github.com/makerdao/dss/actions/workflows/.github/workflows/tests.yaml/badge.svg?branch=master)
 
