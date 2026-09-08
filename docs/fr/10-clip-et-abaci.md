@@ -1,0 +1,9 @@
+# Chapitre 10 — Clip, les encheres hollandaises et Abacus (courbes de prix)
+
+`Clip.sol` implemente l'enchere de liquidation elle-meme, sous forme d'enchere hollandaise (le prix commence haut et baisse dans le temps jusqu'a trouver un acheteur, plutot que le format anglais ou les encheteurs surenchérissent). `kick`, appele par `Dog.bark`, ouvre une nouvelle vente : elle fixe un prix de depart `top` egal au prix de l'oracle majore d'une marge (`buf`), et enregistre le lot de collateral (`lot`) et la dette a couvrir (`tab`).
+
+Le calcul du prix courant d'une enchere en cours est delegue a un contrat `Abacus` separe (`abaci.sol`), configurable par ilk. `LinearDecrease` fait baisser le prix lineairement dans le temps ; `ExponentialDecrease` le multiplie a chaque seconde par un facteur `cut` inferieur a 1 (calcule via une exponentiation entiere en assembly, le meme motif `rpow` que dans `Jug`) ; `StairstepExponentialDecrease` applique ce meme facteur mais par paliers discrets plutot qu'en continu, pour limiter la frequence a laquelle le prix change reellement on-chain. Ce decoupage permet a la gouvernance de changer la strategie de decroissance de prix sans toucher au contrat `Clip` lui-meme.
+
+`take(id, amt, max, who, data)` est la fonction qu'un acheteur appelle pour acquerir tout ou partie du lot en cours d'enchere, jusqu'a une quantite `amt` et un prix maximal `max` qu'il accepte de payer. Elle gere le cas d'un achat partiel qui laisserait un reliquat trop poussiere pour etre revendable (`chost`), forcant alors l'achat de la totalite restante. Un appel externe optionnel (`ClipperCallee.clipperCall`) permet a l'acheteur de recevoir le collateral et d'executer une logique arbitraire (par exemple un flash swap pour financer l'achat) avant de devoir payer le Dai du dans la meme transaction.
+
+[Chapitre suivant : Vow, la comptabilite de la dette, et Pot](11-vow-et-pot.md)
