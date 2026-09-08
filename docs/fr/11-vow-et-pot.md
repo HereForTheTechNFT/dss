@@ -1,0 +1,9 @@
+# Chapitre 11 — Vow, la comptabilite de la dette (heal, flap, flop), et Pot
+
+`Vow.sol` est le "compte de resultat" du systeme : il centralise la dette non couverte issue des liquidations (`Sin`, mise en file d'attente par `fess` puis reconnue apres un delai `wait` via `flog`, pour laisser le temps a une enchere de se resoudre avant de compter sa dette comme definitivement perdue) et le surplus accumule (le Dai que `Vow` detient, provenant des frais de stabilite et des penalites de liquidation).
+
+`heal` reconcilie simplement le surplus et le deficit connus quand les deux sont disponibles, en annulant les deux via `vat.heal`. Quand le deficit depasse ce que le surplus peut couvrir, `flop` declenche une enchere qui dilue un jeton de gouvernance externe (MKR historiquement, ou le nouveau jeton SKY) pour lever du Dai et combler le trou. A l'inverse, quand le surplus depasse un seuil (`hump`, un coussin de securite gardee en reserve), `flap` declenche une enchere qui vend ce surplus de Dai contre le jeton de gouvernance, qui est alors brule — un mecanisme de rachat qui redistribue la valeur du systeme vers les detenteurs du jeton de gouvernance en periode de bonne sante financiere.
+
+`Pot.sol` implemente le DSR (Dai Savings Rate), le taux d'epargne offert aux detenteurs de Dai qui verrouillent leurs jetons dans le contrat. Son fonctionnement recopie exactement le motif de `Jug` : un taux par seconde `dsr`, un accumulateur `chi` mis a jour par `drip` via la meme exponentiation `_rpow`, et l'interet verse est finance par une creation de Dai via `vat.suck` a partir de `vow`. `join`/`exit` deposent et retirent des parts (`pie`) dont la valeur en Dai croit avec `chi`, exactement comme le `rate` d'un ilk fait croitre la dette d'un emprunteur.
+
+[Chapitre suivant : End, le settlement global](12-end.md)
